@@ -1,11 +1,8 @@
 package model
 
-type Query struct {
-}
-
 type Result struct {
 }
 
-func Lookup(q Query) (Result, error) {
+func Lookup(qry []string) (Result, error) {
 	return Result{}, nil
 }

@@ -5,17 +5,13 @@ import (
 	"log"
 	"net"
 
-	"github.com/dustin/go-coap"
+	"github.com/thomas-fossati/go-coap"
 	"github.com/thomas-fossati/gordo/model"
 )
 
 func Lookup(l *net.UDPConn, a *net.UDPAddr, m *coap.Message) *coap.Message {
-
-	// parse the coap.Message to extract query params
-	q := model.Query{}
-
 	// query the data model
-	r, err := model.Lookup(q)
+	r, err := model.Lookup(m.Query())
 	if err != nil {
 		// send some kind of error
 	}
