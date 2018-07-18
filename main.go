@@ -1,21 +1,36 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net"
 
 	"github.com/dustin/go-coap"
+	"github.com/thomas-fossati/gordo/model"
 )
 
-func handleA(l *net.UDPConn, a *net.UDPAddr, m *coap.Message) *coap.Message {
-	log.Printf("Got message in handleA: path=%q: %#v from %v", m.Path(), m, a)
+func Lookup(l *net.UDPConn, a *net.UDPAddr, m *coap.Message) *coap.Message {
+
+	// parse the coap.Message to extract query params
+	q := model.Query{}
+
+	// query the data model
+	r, err := model.Lookup(q)
+	if err != nil {
+		// send some kind of error
+	}
+
+	// format the result into a CoAP payload
+	payload := []byte(fmt.Sprintf("%v", r))
+
+	log.Printf("Got message in Lookup: path=%q: %#v from %v", m.Path(), m, a)
 	if m.IsConfirmable() {
 		res := &coap.Message{
 			Type:      coap.Acknowledgement,
 			Code:      coap.Content,
 			MessageID: m.MessageID,
 			Token:     m.Token,
-			Payload:   []byte("hello to you!"),
+			Payload:   payload,
 		}
 		res.SetOption(coap.ContentFormat, coap.TextPlain)
 
@@ -45,8 +60,7 @@ func handleB(l *net.UDPConn, a *net.UDPAddr, m *coap.Message) *coap.Message {
 
 func main() {
 	mux := coap.NewServeMux()
-	mux.Handle("/a", coap.FuncHandler(handleA))
-	mux.Handle("/b", coap.FuncHandler(handleB))
+	mux.Handle("/rd-lookup", coap.FuncHandler(Lookup))
 
 	log.Fatal(coap.ListenAndServe("udp", ":5683", mux))
 }
