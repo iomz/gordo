@@ -1,8 +1,16 @@
 package model
 
-type Result struct {
+type ResultSet struct {
 }
 
-func Lookup(qry []string) (Result, error) {
-	return Result{}, nil
+func Init() error {
+	// set up database connection
+}
+
+func Lookup(qry []string) (ResultSet, error) {
+	// assemble the query
+	// execute query
+	// format results back
+
+	return Results{}, nil
 }

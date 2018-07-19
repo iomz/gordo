@@ -6,20 +6,21 @@ import (
 	"net"
 
 	"github.com/thomas-fossati/go-coap"
-	"github.com/thomas-fossati/gordo/model"
 )
 
 func Lookup(l *net.UDPConn, a *net.UDPAddr, m *coap.Message) *coap.Message {
 	// query the data model
-	r, err := model.Lookup(m.Query())
-	if err != nil {
-		// send some kind of error
-	}
+	/*
+		r, err := model.Lookup(m.Query())
+		if err != nil {
+			// send some kind of error
+		}
+	*/
 
 	// format the result into a CoAP payload
-	payload := []byte(fmt.Sprintf("%v", r))
+	payload := []byte(fmt.Sprintf("received query was: %s", m.QueryString()))
 
-	log.Printf("Got message in Lookup: path=%q: %#v from %v", m.Path(), m, a)
+	//	log.Printf("Got message in Lookup: path=%q: %#v from %v", m.Path(), m, a)
 	if m.IsConfirmable() {
 		res := &coap.Message{
 			Type:      coap.Acknowledgement,
@@ -30,7 +31,7 @@ func Lookup(l *net.UDPConn, a *net.UDPAddr, m *coap.Message) *coap.Message {
 		}
 		res.SetOption(coap.ContentFormat, coap.TextPlain)
 
-		log.Printf("Transmitting from A %#v", res)
+		//	log.Printf("Transmitting from A %#v", res)
 		return res
 	}
 	return nil
