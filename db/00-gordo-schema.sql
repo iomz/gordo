@@ -23,8 +23,8 @@ CREATE TABLE resource
 
     endpoint integer NOT NULL,
 
-	PRIMARY KEY(id),
-	FOREIGN KEY(endpoint) REFERENCES endpoint(id)
+    PRIMARY KEY(id),
+    FOREIGN KEY(endpoint) REFERENCES endpoint(id)
 );
 
 -- vim: ai ts=4 sw=4 et sts=4 ft=sql
