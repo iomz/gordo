@@ -15,6 +15,29 @@ import (
 
 var g_m *model.Model
 
+func main() {
+	pgCfg := []string{
+		"host=localhost",
+		"port=15432",
+		"user=postgres",
+		"password=123",
+		"dbname=gordo",
+		"sslmode=disable",
+	}
+
+	db, err := sql.Open("postgres", strings.Join(pgCfg, " "))
+	if err != nil {
+		log.Fatal("DB init failed", err)
+	}
+
+	g_m = model.NewModel(db)
+
+	mux := coap.NewServeMux()
+	mux.Handle("/rd-lookup/res", coap.FuncHandler(LookupRes))
+
+	log.Fatal(coap.ListenAndServe("udp", ":5683", mux))
+}
+
 func LookupRes(l *net.UDPConn, a *net.UDPAddr, m *coap.Message) *coap.Message {
 	// query the data model
 	rs, err := g_m.ResourceLookup(m.Query())
@@ -39,45 +62,4 @@ func LookupRes(l *net.UDPConn, a *net.UDPAddr, m *coap.Message) *coap.Message {
 		return res
 	}
 	return nil
-}
-
-func handleB(l *net.UDPConn, a *net.UDPAddr, m *coap.Message) *coap.Message {
-	log.Printf("Got message in handleB: path=%q: %#v from %v", m.Path(), m, a)
-	if m.IsConfirmable() {
-		res := &coap.Message{
-			Type:      coap.Acknowledgement,
-			Code:      coap.Content,
-			MessageID: m.MessageID,
-			Token:     m.Token,
-			Payload:   []byte("good bye!"),
-		}
-		res.SetOption(coap.ContentFormat, coap.TextPlain)
-
-		log.Printf("Transmitting from B %#v", res)
-		return res
-	}
-	return nil
-}
-
-func main() {
-	mux := coap.NewServeMux()
-	mux.Handle("/rd-lookup/res", coap.FuncHandler(LookupRes))
-
-	pgCfg := []string{
-		"host=localhost",
-		"port=15432",
-		"user=postgres",
-		"password=123",
-		"dbname=gordo",
-		"sslmode=disable",
-	}
-
-	db, err := sql.Open("postgres", strings.Join(pgCfg, " "))
-	if err != nil {
-		panic(err)
-	}
-
-	g_m = model.NewModel(db)
-
-	log.Fatal(coap.ListenAndServe("udp", ":5683", mux))
 }
