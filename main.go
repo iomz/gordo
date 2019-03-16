@@ -56,9 +56,9 @@ func LookupRes(l *net.UDPConn, a *net.UDPAddr, m *coap.Message) *coap.Message {
 			Token:     m.Token,
 			Payload:   payload,
 		}
+
 		res.SetOption(coap.ContentFormat, coap.AppLinkFormat)
 
-		//	log.Printf("Transmitting from A %#v", res)
 		return res
 	}
 	return nil
