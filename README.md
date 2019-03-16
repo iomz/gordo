@@ -30,7 +30,7 @@ go get -u ./...
 go build
 ```
 
-## Run gordo
+## Run gordo
 
 - Start up the dockerized PostgreSQL backend:
 ```
@@ -56,7 +56,7 @@ coap get 'coap://localhost/rd-lookup/res?rt=temperature'
 docker-compose down
 ```
 
-# Fiddling around
+## Fiddling around
 
 - Get a session on the DB (password is "123")
 ```
