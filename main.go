@@ -4,12 +4,11 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
-	"net"
 	"strings"
 
 	_ "github.com/lib/pq"
 
-	"github.com/thomas-fossati/go-coap"
+	"github.com/thomas-fossati/go-coap-1"
 	"github.com/thomas-fossati/gordo/model"
 )
 
@@ -33,33 +32,24 @@ func main() {
 	g_m = model.NewModel(db)
 
 	mux := coap.NewServeMux()
-	mux.Handle("/rd-lookup/res", coap.FuncHandler(LookupRes))
+	mux.Handle("/rd-lookup/res", coap.HandlerFunc(LookupRes))
 
-	log.Fatal(coap.ListenAndServe("udp", ":5683", mux))
+	log.Fatal(coap.ListenAndServe(":5683", "udp", mux))
 }
 
-func LookupRes(l *net.UDPConn, a *net.UDPAddr, m *coap.Message) *coap.Message {
+func LookupRes(w coap.ResponseWriter, req *coap.Request) {
 	// query the data model
-	rs, err := g_m.ResourceLookup(m.Query())
+	rs, err := g_m.ResourceLookup(req.Msg.Query())
 	if err != nil {
 		fmt.Println("TODO send 5.xx: ", err)
 	}
 
+	w.SetContentFormat(coap.AppLinkFormat)
+
 	// format the result into link-format
 	payload := []byte(rs.LinkFormat())
 
-	if m.IsConfirmable() {
-		res := &coap.Message{
-			Type:      coap.Acknowledgement,
-			Code:      coap.Content,
-			MessageID: m.MessageID,
-			Token:     m.Token,
-			Payload:   payload,
-		}
-
-		res.SetOption(coap.ContentFormat, coap.AppLinkFormat)
-
-		return res
+	if _, err := w.Write(payload); err != nil {
+		log.Printf("Cannot send response: %v", err)
 	}
-	return nil
 }
