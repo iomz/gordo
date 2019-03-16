@@ -17,8 +17,12 @@ CREATE TABLE resource
     id serial,
 
     path text,
-    ct integer,
+    ct integer CHECK(ct >= -1 AND ct <= 65535) DEFAULT -1,
+    rt text,
+    if text,
     anchor text,
+    title text,
+    rel text,
     extra_attrs hstore,
 
     endpoint integer NOT NULL,

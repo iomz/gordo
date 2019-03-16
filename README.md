@@ -1,7 +1,7 @@
 # gordo
 A CoRE Resource Directory in Go!
 
-# Dockerised DB
+## Dockerised DB
 
 - Start up
 ```
@@ -23,5 +23,16 @@ brew install postgresql
 psql -p 15432  -U postgres -h localhost -d gordo
 ```
 
+## Gordo build
 
+- install dependencies
+```
+go get -u ./...
+```
 
+- build gordo
+```
+go build
+```
+
+ 

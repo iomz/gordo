@@ -1,16 +1,14 @@
 package model
 
-type ResultSet struct {
+import "database/sql"
+
+type Model struct {
+	DB *sql.DB
 }
 
-func Init() error {
-	// set up database connection
-}
-
-func Lookup(qry []string) (ResultSet, error) {
-	// assemble the query
-	// execute query
-	// format results back
-
-	return Results{}, nil
+// TODO(tho) pass the db
+func NewModel(db *sql.DB) *Model {
+	return &Model{
+		DB: db,
+	}
 }
