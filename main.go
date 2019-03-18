@@ -8,7 +8,7 @@ import (
 
 	_ "github.com/lib/pq"
 
-	"github.com/thomas-fossati/go-coap-1"
+	"github.com/go-ocf/go-coap"
 	"github.com/thomas-fossati/gordo/model"
 )
 
