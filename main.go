@@ -1,11 +1,13 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"log"
 	"strings"
 
+	"github.com/brutella/dnssd"
 	_ "github.com/lib/pq"
 
 	"github.com/go-ocf/go-coap"
@@ -34,7 +36,46 @@ func main() {
 	mux := coap.NewServeMux()
 	mux.Handle("/rd-lookup/res", coap.HandlerFunc(LookupRes))
 
+	// start DNS-SD
+	go dnsSDStart()
+
 	log.Fatal(coap.ListenAndServe(":5683", "udp", mux))
+}
+
+func dnsSDStart() error {
+	r, err := dnssd.NewResponder()
+	if err != nil {
+		return err
+	}
+
+	// read from DB and configure and add services to the responder
+	for _, sv := range dnsSDInit() {
+		_, err := r.Add(sv)
+		if err != nil {
+			return err
+		}
+	}
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	r.Respond(ctx)
+
+	return nil
+}
+
+func dnsSDInit() []dnssd.Service {
+	x, _ := dnssd.NewService(
+		dnssd.Config{
+			Domain: "local",
+			Name:   "Spot",
+			Type:   "_oic-d-light._udp",
+			Port:   12345,
+		},
+	)
+
+	// dummy
+	return []dnssd.Service{x}
 }
 
 func LookupRes(w coap.ResponseWriter, req *coap.Request) {
